@@ -94,7 +94,9 @@ class Base():
     
 <details><summary>A series of Pipes</summary>
 <p>
+    
 A pipe class consists of 2 pipes in the same horizontal location, one flipped on top and other in the bottom.
+
 ```python
 class Pipe():
     GAP = int(WIN_HEIGHT//4)
@@ -117,10 +119,35 @@ class Pipe():
         win.blit(self.img, (self.x, self.y))
         win.blit(self.img_flip, (self.x, self.y_flip))  
 ```
+
 In the main environment, we need to create a series of pipes that keep running over the Pygame window
+
 ```python
+            
+class FlappyBird():
+    def __init__(self, nbirds = 1):
+        self.pipe_dist = int(WIN_WIDTH/3)
+        self.pipes = [Pipe(self.pipe_dist*i) for i in range(2,6)]
+        
+    def reset(self):
+        self.pipes = [Pipe(self.pipe_dist*i) for i in range(2,6)]
     
+    def render(self):
+        self.win.blit(bg_img, (0,0))
+        self.base.draw(self.win)
+        for pipe in self.pipes:
+            pipe.draw(self.win)
+    
+     def step(self, action):
+        #redraw the pipe if it goes out of screen
+        if self.pipes[0].isValid == 0:
+            new_pipe = Pipe(self.pipes[-1].x+self.pipe_dist)
+            self.pipes = self.pipes[1:] +[new_pipe]
+        self.base.move()
+        for pipe in self.pipes:
+            pipe.move()
 ```
+
 </p>
 </details>
     
