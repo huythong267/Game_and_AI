@@ -34,6 +34,9 @@ win.blit(self.img, (self.x, self.y))
 
 
 **To rotate a loaded image**
+
+<details><summary>Codes and Techniques</summary>
+<p>
 ```python
 topleft, angle = (self.x, self.y), self.tilt
 rotated_image = pygame.transform.rotate(image, angle)
@@ -41,11 +44,15 @@ new_rect = rotated_image.get_rect(center = image.get_rect(topleft = topleft).cen
 
 win.blit(rotated_image, new_rect.topleft)
 ```
+</p>
+</details>
 
 **Interesting code to visualize the "flappy" movements** 
 
 The code can be shorter by writing some mapping functions, however, I prefer the code written this way for better clarity as I immediately understand the code in the first time I see it.
 
+<details><summary>Codes and Techniques</summary>
+<p>
 ```python
 self.img_count += 1
 if   self.img_count< 1*self.flip_every: index = 0
@@ -58,6 +65,9 @@ else:
 
 image = self.imgs[index]
 ```
+</p>
+</details>
+
 * Text box as an image *
 
 Similar to display an image, we can **render** from a **pygame.Sysfont**
@@ -79,7 +89,7 @@ pygame.display.update()
 
 
 
-### Environment Objects
+## Environment Objects
 
 FlappyBird environment comprises of (1) background + moving base (2) a series of pipes (3) a bird or a number of birds
 
