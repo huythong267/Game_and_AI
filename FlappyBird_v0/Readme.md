@@ -76,6 +76,9 @@ pygame.display.update()
 </p>
 </details>
 
+
+
+
 ### Environment Objects
 
 FlappyBird environment comprises of (1) background + moving base (2) a series of pipes (3) a bird or a number of birds
@@ -86,7 +89,6 @@ We need a background image with moving bases. For the movement, we need to creat
 
 <details><summary>Codes</summary>
 <p>
-
 
 ```python
 class Base():
@@ -317,6 +319,7 @@ class FlappyBird():
 </details>
     
     
+    
 #### Score, Generation, States, Rewards, and render(), step(), reset()
 
 Several variables for storing score/generation/reward.
@@ -326,7 +329,7 @@ Also, following the standard in gym environment, I would prefer to return states
 I also need variables for the action_space and environment_space, which I did not follow the standard for now...
 For env.states, I simply calculate the states of the first bird.
 
-<details><summary>Codes for Calculate  in FlappyBird class</summary>
+<details><summary>Codes for state/action/reward in FlappyBird </summary>
 <p>
 
 ```python
@@ -376,6 +379,7 @@ class FlappyBird():
 
 </p>
 </details>
+
 
 
 
