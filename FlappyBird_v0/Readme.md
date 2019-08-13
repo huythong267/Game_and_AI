@@ -1,5 +1,9 @@
 # Create a FlappyBird enviroment
 
+Credited to initial starting point:
+[Tech With Tim - NEAT Flappy Bird](https://github.com/techwithtim/NEAT-Flappy-Bird)
+
+Disclaimer: This repository is not for any comercial use
 Same as other games in this repository, Pygame is the toolbox to render background video.
 In the snake game, I simply draw rectangular and line to visualize the movement of snake and snack. Pygame receives the keyboard values from human and performs actions on the snake_v0 environment.
 I take one step further to utilize images and text display rather than simply Pygame drawing to render environment in this game.
