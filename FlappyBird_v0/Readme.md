@@ -201,7 +201,7 @@ A bird class consists of a single bird. The movement of the bird must follow New
 
 (1) Movement for locations + movement for rotations - Take some time to find tune all the parameters.  
 (2) Need to check of the bird and the pipe area overlap for the collision. This is an interesting algorithm problem.  
-[LeetCode Rectangle Overlap](https://leetcode.com/problems/rectangle-overlap/). I would prefer to even calculate the overlaping area as well [LeetCode Rectangle Area](https://leetcode.com/problems/rectangle-area/) 
+[LeetCode Rectangle Overlap](https://leetcode.com/problems/rectangle-overlap/). I would prefer to even calculate the overlaping area as well [LeetCode Rectangle Area](https://leetcode.com/problems/rectangle-area/)    
 (3) To build a controller to play this game, we need the information of the location of one bird with regard to the locations of the pipes. So I write an additional function cal_bird_states() that sometimes draw the lines to the end of the pipes as well.  
     
 <details><summary>Codes for Bird class</summary>
