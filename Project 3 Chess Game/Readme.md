@@ -21,12 +21,11 @@ class Chess():
     def render(self):
         self.win.blit(self.board_img, (0,0))
         pygame.display.update()
+```
+
+Function to display the object in pygame:
+
 ```python
-
-display:
-
-```python
-
 chess = Chess(50)
 run = True
 while run:
