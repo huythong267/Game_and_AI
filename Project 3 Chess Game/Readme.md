@@ -94,8 +94,58 @@ class Bishop():
         locx, locy = self.grid*self.x + self.pad, self.grid*self.y + self.pad
         win.blit(self.img, (locx, locy))
 ```
+## Knight
+
+```python
+b_knight = pygame.image.load(os.path.join('img','black_knight.png'))
+w_knight = pygame.image.load(os.path.join('img','white_knight.png'))
+
+class Knight():    
+    def __init__(self, win, color, loc):
+        self.pad = int(win.WIDTH*0.1)
+        self.grid, self.width, self.color = win.WIDTH, win.WIDTH - self.pad*2, color
+        if   color == 'b': self.img = pygame.transform.scale(b_knight, (self.width, self.width))
+        elif color == 'w': self.img = pygame.transform.scale(w_knight, (self.width, self.width))
+        
+        self.x, self.y = loc
+    
+    def valid_moves(self, board):
+        x, y, moves = self.x, self.y, []
+        #Bishop can only move in diagonal direction where no other object block its sight
+        move_knight = [(-2,-1),(-2,1),(-1,2),(-1,-2),(1,2),(1,-2),(2,1),(2,-1)]
+        for dx, dy in move_knight:
+            this_x, this_y = x+dx,y+dy
+            if -1<this_x<8 and -1<this_y<8:
+                if board[this_x][this_y] == None or board[this_x][this_y].color != self.color: 
+                    moves.append((this_x, this_y))
+        return moves
+    
+    def draw(self,win):
+        locx, locy = self.grid*self.x + self.pad, self.grid*self.y + self.pad
+        win.blit(self.img, (locx, locy))
+```
 
 # Env: Chess
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
 
 
 ```python
