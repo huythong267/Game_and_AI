@@ -39,7 +39,7 @@ while run:
 
 # Objects: Bishop, King, Knight, Pawn, Queen, Rook
 
-First, we need to have a top-level data to manage all the objects in the chess game
+First, we need to have a top-level data **self.board** to manage all the objects in the chess game
 
 ```python
 class Chess():
@@ -51,9 +51,7 @@ class Chess():
         self.board[x2][y2] = Bishop(self,'b',(x2,y2))  #Example
         
     def render(self):
-        self.win.blit(self.board_img, (0,0))
         self.draw_board()
-        pygame.display.update()
     
     def draw_board(self):
         for r in range(8):
