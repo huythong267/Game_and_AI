@@ -1,11 +1,31 @@
 # Create a Chess enviroment
 
 Credited to initial starting point:
-[Tech With Tim - Chess Game](https://github.com/techwithtim/Online-Chess-Game)
+[Tech With Tim - Chess Game](https://github.com/techwithtim/Online-Chess-Game)   
+[TicTacToe](https://github.com/GunjanChhablani/Tic-Tac-Toe-with-PyGame/blob/master/tictactoe.py)   
 
 Disclaimer: This repository is not for any comercial use
 
 With the image importing lessoned learnt, I would immediately move into the objects and main enviroment of the class.
+
+# Pygame tutorial
+
+To access the mouse click information:
+```python
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+            
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            x,y = event.pos
+        
+        if event.type==pg.KEYDOWN :
+            if event.key==pg.K_r:
+            if event.key==pg.K_q:
+            if event.type==pg.KEYDOWN:
+
+```
+
 
 # Create chess environment with main board:
 
@@ -118,7 +138,7 @@ class Knight():
         
 ```
 
-## Object: Rock
+## Object: Rook
 
 
 ```python
@@ -147,9 +167,84 @@ class Rook():
     def draw(self,win):
 ```
 
+## Queen
 
 ```python
+b_queen = pygame.image.load(os.path.join('img','black_queen.png'))
+w_queen = pygame.image.load(os.path.join('img','white_queen.png'))
 
+class Queen():    
+    def __init__(self, win, color, loc):
+    
+    def valid_moves(self, board):
+        x, y, moves = self.x, self.y, []
+        #Queen = rook + bishop
+        move_rook = [(0,1),(0,-1), (-1,0),(1,0)]
+        move_diagonal = [(1,1),(1,-1), (-1,1),(-1,-1)]
+        for dx, dy in move_rook + move_diagonal:
+            this_x, this_y = x+dx,y+dy
+            while -1<this_x<8 and -1<this_y<8:
+                if board[this_x][this_y] == None: 
+                    moves.append((this_x, this_y))
+                    this_x, this_y = this_x+ dx, this_y+ dy
+                else:
+                    if board[this_x][this_y].color != self.color: moves.append((this_x, this_y))
+                    break
+        return moves
+    
+    def draw(self,win):
+
+```
+
+## King
+
+```python
+b_king = pygame.image.load(os.path.join('img','black_king.png'))
+w_king = pygame.image.load(os.path.join('img','white_king.png'))
+
+class King():    
+    def __init__(self, win, color, loc):
+
+    def valid_moves(self, board):
+        x, y, moves = self.x, self.y, []
+        #King = rook + bishop in one move nearby
+        move_rook = [(0,1),(0,-1), (-1,0),(1,0)]
+        move_diagonal = [(1,1),(1,-1), (-1,1),(-1,-1)]
+        for dx, dy in move_rook + move_diagonal:
+            this_x, this_y = x+dx,y+dy
+            if -1<this_x<8 and -1<this_y<8:
+                if board[this_x][this_y] == None or board[this_x][this_y].color != self.color: 
+                    moves.append((this_x, this_y))
+        return moves
+    
+    def draw(self,win):
+```
+## Pawn
+
+```python
+b_pawn = pygame.image.load(os.path.join('img','black_pawn.png'))
+w_pawn = pygame.image.load(os.path.join('img','white_pawn.png'))
+
+class Pawn():    
+    def __init__(self, win, color, loc):
+    
+    def valid_moves(self, board):
+        x, y, moves = self.x, self.y, []
+        #pawn: depends on color + nearby
+        move_pawn_color = [(0,1,'b'), (1,1,'b'),(-1,1,'b'), (0,-1,'w'),(-1,-1,'w'),(1,-1,'w')]
+        move_pawn = [(dx,dy) for dx, dy, color in move_pawn_color if color == self.color]
+        
+        for dx, dy, color in move_pawn:
+            this_x, this_y = x+dx,y+dy
+            if -1<this_x<8 and -1<this_y<8:
+                if dx == 0 and (board[this_x][this_y] == None or  board[this_x][this_y].color != self.color): 
+                    moves.append((this_x, this_y))
+                elif dx!= 0  and board[this_x][this_y] != None and board[this_x][this_y].color != self.color:
+                    moves.append((this_x, this_y))                
+        return moves
+    
+    def draw(self,win):
+    
 ```
 
 
@@ -157,11 +252,25 @@ class Rook():
 
 ```
 
+```python
+
+```
 
 ```python
 
 ```
 
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
 
 ```python
 
