@@ -233,20 +233,121 @@ class Pawn():
         #pawn: depends on color + nearby
         move_pawn_color = [(0,1,'b'), (1,1,'b'),(-1,1,'b'), (0,-1,'w'),(-1,-1,'w'),(1,-1,'w')]
         move_pawn = [(dx,dy) for dx, dy, color in move_pawn_color if color == self.color]
-        
-        for dx, dy, color in move_pawn:
+
+        for dx, dy in move_pawn:
             this_x, this_y = x+dx,y+dy
             if -1<this_x<8 and -1<this_y<8:
                 if dx == 0 and (board[this_x][this_y] == None or  board[this_x][this_y].color != self.color): 
                     moves.append((this_x, this_y))
                 elif dx!= 0  and board[this_x][this_y] != None and board[this_x][this_y].color != self.color:
-                    moves.append((this_x, this_y))                
+                    moves.append((this_x, this_y))
+        
+        if (y, self.color) in [(1,'b'),(6,'w')]:
+            dy = 2 if self.color == 'b' else -2
+            if board[x+0][y+dy] == None or  board[x+0][y+dy].color != self.color:
+                moves.append((x+0,y+dy))
+                
         return moves
     
     def draw(self,win):
     
 ```
+# Chess: Render(), Reset(), Step()
 
+First, we need to render the full chess table first. Generating Objects on the board tables:
+
+```python
+class Chess():
+    def __init__(self, WIDTH):
+        self.board = [[None for _ in range(8)] for _ in range(8)]
+        
+        rooks = [(0,0,'b'),(7,0,'b'),(0,7,'w'),(7,7,'w')]
+        for x,y,color in rooks:
+            self.board[x][y] = Rook(self,color,(x,y))
+        
+        knights = [(1,0,'b'),(6,0,'b'),(1,7,'w'),(6,7,'w')]
+        for x,y,color in knights:
+            self.board[x][y] = Knight(self,color,(x,y))
+        
+        bishops = [(2,0,'b'),(5,0,'b'),(2,7,'w'),(5,7,'w')]
+        for x,y,color in bishops:
+            self.board[x][y] = Bishop(self,color,(x,y))
+        
+        queens = [(4,0,'b'),(3,7,'w')]
+        for x,y,color in queens:
+            self.board[x][y] = Queen(self,color,(x,y))
+            
+        kings = [(3,0,'b'),(4,7,'w')]
+        for x,y,color in kings:
+            self.board[x][y] = King(self,color,(x,y))
+        
+        pawns = [(x,y,color) for x in range(8) for y,color in [(1,'b'),(6,'w')]]
+        for x,y,color in pawns:
+            self.board[x][y] = Pawn(self,color,(x,y))
+```
+
+Next, we need to implement the basic movement of the chess game
+(1) collect the input from the user on how to move the chess game with start, end
+(2) update the board & change the turn ('b' or 'w')
+
+```python
+class Chess():
+    def __init__(self, WIDTH):
+        
+    def render(self):
+
+    def step(self):
+        start, end = self.collect_agent_inputs()
+        if start and end:
+            self.update_move(start, end)
+            self.turn = 'b' if self.turn == 'w' else 'w'
+    
+    def collect_agent_inputs(self):
+        start, possible_moves, Next = None, None, None
+        valid_objects = {(x,y) for x in range(8) for y in range(8) 
+                         if self.board[x][y] != None and self.board[x][y].color == self.turn}
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:             return None, None
+                if event.type == pygame.MOUSEBUTTONDOWN:  Next = (event.pos[0]//self.WIDTH, event.pos[1]//self.WIDTH)
+            if start and Next in possible_moves:
+                return start, Next
+            if Next in valid_objects:
+                start = Next
+                possible_moves = self.board[start[0]][start[1]].valid_moves(self.board)
+                self.draw_circle(start, possible_moves)
+    
+    def draw_circle(self, start, possible_moves):
+        x, y = start
+        circle = (int((x+0.5)*self.WIDTH),int((y+0.5)*self.WIDTH))
+        pygame.draw.circle(self.win, (150,0,0), circle, self.RADIOUS)
+        for x1, y1 in possible_moves:
+            circle = (int((x1+0.5)*self.WIDTH),int((y1+0.5)*self.WIDTH))
+            pygame.draw.circle(self.win, (0,255,0), circle, self.RADIOUS)
+        pygame.display.update()
+        self.render()
+                
+    def update_move(self, start, end):
+        x1, y1 = start
+        x2, y2 = end
+        self.board[x1][y1].x, self.board[x1][y1].y = x2, y2
+        self.board[x2][y2], self.board[x1][y1]  = self.board[x1][y1], None
+```
+
+Several auxiliary functions
+(1) change the pawn to queen/rock/knight/bishop if it goes to the end of the line
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
 
 ```python
 
