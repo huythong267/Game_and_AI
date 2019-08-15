@@ -19,10 +19,9 @@ To access the mouse click information:
         if event.type == pygame.MOUSEBUTTONDOWN:
             x,y = event.pos
         
-        if event.type==pg.KEYDOWN :
-            if event.key==pg.K_r:
-            if event.key==pg.K_q:
-            if event.type==pg.KEYDOWN:
+        if event.type==pygame.KEYDOWN :
+            if event.key==pygame.K_r:
+            if event.key==pygame.K_q:
 
 ```
 
@@ -257,50 +256,65 @@ class Pawn():
 First, we need to render the full chess table first. Generating Objects on the board tables:
 
 ```python
+rooks   = [(0,0,'b'),(7,0,'b'),(0,7,'w'),(7,7,'w')]
+knights = [(1,0,'b'),(6,0,'b'),(1,7,'w'),(6,7,'w')]
+bishops = [(2,0,'b'),(5,0,'b'),(2,7,'w'),(5,7,'w')]
+queens  = [(3,0,'b'),(3,7,'w')]
+kings   = [(4,0,'b'),(4,7,'w')]
+pawns   = [(x,y,color) for x in range(8) for y,color in [(1,'b'),(6,'w')]]
+
+pieces =  [rooks, knights, bishops, queens, kings, pawns]
+names  =  ['rook','knight','bishop','queen','king','pawn']
+chess_init = [(x, y, color,name) for piece, name in zip(pieces, names) for x, y, color in piece]
+
 class Chess():
     def __init__(self, WIDTH):
+        self.WIDTH, self.RADIOUS  = WIDTH, int(WIDTH//8)
+        self.win = pygame.display.set_mode([self.WIDTH*8, self.WIDTH*8])
+        self.board_img = pygame.transform.scale(board_img, (self.WIDTH*8, self.WIDTH*8))
+        
+        self.turn = 'w'
         self.board = [[None for _ in range(8)] for _ in range(8)]
-        
-        rooks = [(0,0,'b'),(7,0,'b'),(0,7,'w'),(7,7,'w')]
-        for x,y,color in rooks:
-            self.board[x][y] = Rook(self,color,(x,y))
-        
-        knights = [(1,0,'b'),(6,0,'b'),(1,7,'w'),(6,7,'w')]
-        for x,y,color in knights:
-            self.board[x][y] = Knight(self,color,(x,y))
-        
-        bishops = [(2,0,'b'),(5,0,'b'),(2,7,'w'),(5,7,'w')]
-        for x,y,color in bishops:
-            self.board[x][y] = Bishop(self,color,(x,y))
-        
-        queens = [(4,0,'b'),(3,7,'w')]
-        for x,y,color in queens:
-            self.board[x][y] = Queen(self,color,(x,y))
-            
-        kings = [(3,0,'b'),(4,7,'w')]
-        for x,y,color in kings:
-            self.board[x][y] = King(self,color,(x,y))
-        
-        pawns = [(x,y,color) for x in range(8) for y,color in [(1,'b'),(6,'w')]]
-        for x,y,color in pawns:
-            self.board[x][y] = Pawn(self,color,(x,y))
+        for x,y,color, name in chess_init:
+            self.board[x][y] = Piece(self,name,color,(x,y))
+    
+    def reset(self):
+        self.board = [[None for _ in range(8)] for _ in range(8)]
+        for x,y,color, name in chess_init:
+            self.board[x][y] = Piece(self,name,color,(x,y))
 ```
 
 Next, we need to implement the basic movement of the chess game
-(1) collect the input from the user on how to move the chess game with start, end
-(2) update the board & change the turn ('b' or 'w')
+(1) collect the input from the user on how to move the chess game with start, end       
+(2) update the board & change the turn ('b' or 'w')     
 
 ```python
-class Chess():
-    def __init__(self, WIDTH):
-        
-    def render(self):
+    def step(self, action = None):
+        start, Next = self.collect_agent_inputs() if not action else action
+        if start and Next:
+            gameover = self.isGameOver(Next)
+            self.update_move(start, Next)
 
-    def step(self):
-        start, end = self.collect_agent_inputs()
-        if start and end:
-            self.update_move(start, end)
-            self.turn = 'b' if self.turn == 'w' else 'w'
+            if not gameover:
+                self.potential_pawn_change(Next)
+                if self.isChecked(Next):
+                    self.display_remark('Check')
+                    self.get_user_input()
+                    
+                self.turn = 'b' if self.turn == 'w' else 'w'
+            else:
+                self.display_remark('Game Over')
+                self.get_user_input()
+            return gameover
+        else: return True
+```
+
+Several auxiliary functions
+(1) step() helper functions
+
+```python
+    ############## Some chess.step() helper functions #################################################
+    ############## step() function is quite complicated for chess compared to snake or flappy bird ####
     
     def collect_agent_inputs(self):
         start, possible_moves, Next = None, None, None
@@ -317,6 +331,58 @@ class Chess():
                 possible_moves = self.board[start[0]][start[1]].valid_moves(self.board)
                 self.draw_circle(start, possible_moves)
     
+    def isGameOver(self, Next):
+        x, y = Next
+        return self.board[x][y] and self.board[x][y].name == 'king' and self.board[x][y].color != self.turn
+    
+    def update_move(self, start, Next):
+        x1, y1 = start
+        x2, y2 = Next
+        self.board[x1][y1].x, self.board[x1][y1].y = x2, y2
+        self.board[x2][y2], self.board[x1][y1]  = self.board[x1][y1], None
+        
+    def isChecked(self, Next):
+        x, y = Next
+        check_locations = self.board[x][y].valid_moves(self.board)
+        for x, y in check_locations:
+            if self.board[x][y] and self.board[x][y].name == 'king' and self.board[x][y].color != self.turn:
+                return True
+        return False
+    
+    def potential_pawn_change(self, Next):
+        x, y, color = Next[0], Next[1], self.turn
+        if (y, color) in [(7,'b'),(0,'w')] and self.board[x][y] and self.board[x][y].name == 'pawn':
+            self.render()
+            self.display_remark('Q: Queen, K: Knight, B: Bishop, R: Rock')
+            
+            self.board[x][y] = None
+            while True:
+                for event in pygame.event.get():
+                    if event.type==pygame.KEYDOWN :
+                        if   event.key==pygame.K_q: self.board[x][y] = Piece(self,'queen',color,(x,y))
+                        elif event.key==pygame.K_k: self.board[x][y] = Piece(self,'knight',color,(x,y))
+                        elif event.key==pygame.K_b: self.board[x][y] = Piece(self,'bishop',color,(x,y))
+                        elif event.key==pygame.K_r: self.board[x][y] = Piece(self,'rook',color,(x,y))
+                if self.board[x][y] != None: 
+                    self.render()
+                    return
+```
+
+(2) Display helper function
+
+```python
+    def draw_board(self):
+        for r in range(8):
+            for c in range(8):
+                if self.board[r][c] != None: self.board[r][c].draw(self.win)
+    
+    def display_remark(self, string):
+        self.render()
+        print(string)
+        remark = STAT_FONT.render(string, 100, (0,255,0))
+        self.win.blit(remark, (self.WIDTH, self.WIDTH*5))
+        pygame.display.update()
+    
     def draw_circle(self, start, possible_moves):
         x, y = start
         circle = (int((x+0.5)*self.WIDTH),int((y+0.5)*self.WIDTH))
@@ -325,32 +391,51 @@ class Chess():
             circle = (int((x1+0.5)*self.WIDTH),int((y1+0.5)*self.WIDTH))
             pygame.draw.circle(self.win, (0,255,0), circle, self.RADIOUS)
         pygame.display.update()
-        self.render()
-                
-    def update_move(self, start, end):
-        x1, y1 = start
-        x2, y2 = end
-        self.board[x1][y1].x, self.board[x1][y1].y = x2, y2
-        self.board[x2][y2], self.board[x1][y1]  = self.board[x1][y1], None
+    
+    def get_user_input(self):
+        move_on = False
+        while not move_on:
+            for event in pygame.event.get():
+                if event.type in [pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
+                    move_on = True
 ```
 
-Several auxiliary functions
-(1) change the pawn to queen/rock/knight/bishop if it goes to the end of the line
+(3) Press Space to Continue
 
 ```python
+    def press_space_to_continue(self):
+        self.display_remark('Press Space to Continue')
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key== pygame.K_SPACE:
+                        self.reset()
+                        return False
+                    else:
+                        self.display_remark('Stopping ... Thank you for playing')
+                        self.get_user_input()
+                        return True
 
 ```
 
-```python
-
-```
+# Play Chess
 
 ```python
-
-```
-
-```python
-
+def play_chess():
+    chess = Chess(100)
+    clock = pygame.time.Clock()
+    gameover = False
+    while not gameover:
+        clock.tick(1)
+        chess.render()
+        gameover = chess.step()
+        if gameover:
+            gameover = chess.press_space_to_continue()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                gameover = True
+                pygame.display.quit()
+                break    
 ```
 
 ```python
