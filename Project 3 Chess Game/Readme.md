@@ -251,6 +251,116 @@ class Pawn():
     def draw(self,win):
     
 ```
+
+# Piece:
+
+```python
+img_map = { ('knight','b'): b_knight, ('knight','w'): w_knight,
+            ('king',  'b'): b_king  , ('king',  'w'): w_king  ,
+            ('rook',  'b'): b_rook  , ('rook',  'w'): w_rook  ,
+            ('pawn',  'b'): b_pawn  , ('pawn',  'w'): w_pawn  ,
+            ('queen', 'b'): b_queen , ('queen', 'w'): w_queen ,
+            ('bishop','b'): b_bishop, ('bishop','w'): w_bishop,
+          }
+
+class Piece():
+    def __init__(self, win, name, color, loc):
+        self.pad = int(win.WIDTH*0.1)
+        self.grid, self.width = win.WIDTH, win.WIDTH - self.pad*2
+        self.name, self.color = name, color
+        
+        img = img_map[(self.name, self.color)]
+        self.img = pygame.transform.scale(img, (self.width, self.width))
+        
+        self.x, self.y = loc
+        
+    def draw(self,win):
+        locx, locy = self.grid*self.x + self.pad, self.grid*self.y + self.pad
+        win.blit(self.img, (locx, locy))
+        
+    def valid_moves(self, board):
+        x, y, moves = self.x, self.y, []
+        
+        if   self.name == 'bishop':
+            #Bishop can only move in diagonal direction where no other object block its sight
+            move_diagonal = [(1,1),(1,-1), (-1,1),(-1,-1)]
+            for dx, dy in move_diagonal:
+                this_x, this_y = x+dx,y+dy
+                while -1<this_x<8 and -1<this_y<8:
+                    if board[this_x][this_y] == None: 
+                        moves.append((this_x, this_y))
+                        this_x, this_y = this_x+ dx, this_y+ dy
+                    else:
+                        if board[this_x][this_y].color != self.color: moves.append((this_x, this_y))
+                        break
+        
+        elif self.name == 'rook':
+            move_rock = [(0,1),(0,-1), (-1,0),(1,0)]
+            for dx, dy in move_rock:
+                this_x, this_y = x+dx,y+dy
+                while -1<this_x<8 and -1<this_y<8:
+                    if board[this_x][this_y] == None: 
+                        moves.append((this_x, this_y))
+                        this_x, this_y = this_x+ dx, this_y+ dy
+                    else:
+                        if board[this_x][this_y].color != self.color: moves.append((this_x, this_y))
+                        break
+        
+        elif self.name == 'queen':
+            #Queen = rook + bishop
+            move_rook = [(0,1),(0,-1), (-1,0),(1,0)]
+            move_diagonal = [(1,1),(1,-1), (-1,1),(-1,-1)]
+            for dx, dy in move_rook + move_diagonal:
+                this_x, this_y = x+dx,y+dy
+                while -1<this_x<8 and -1<this_y<8:
+                    if board[this_x][this_y] == None: 
+                        moves.append((this_x, this_y))
+                        this_x, this_y = this_x+ dx, this_y+ dy
+                    else:
+                        if board[this_x][this_y].color != self.color: moves.append((this_x, this_y))
+                        break
+                        
+        elif self.name == 'king':
+            #King = rook + bishop in one move nearby
+            move_rook = [(0,1),(0,-1), (-1,0),(1,0)]
+            move_diagonal = [(1,1),(1,-1), (-1,1),(-1,-1)]
+            for dx, dy in move_rook + move_diagonal:
+                this_x, this_y = x+dx,y+dy
+                if -1<this_x<8 and -1<this_y<8:
+                    if board[this_x][this_y] == None or board[this_x][this_y].color != self.color: 
+                        moves.append((this_x, this_y))
+        
+        elif self.name == 'knight':
+            move_knight = [(-2,-1),(-2,1),(-1,2),(-1,-2),(1,2),(1,-2),(2,1),(2,-1)]
+            for dx, dy in move_knight:
+                this_x, this_y = x+dx,y+dy
+                if -1<this_x<8 and -1<this_y<8:
+                    if board[this_x][this_y] == None or board[this_x][this_y].color != self.color: 
+                        moves.append((this_x, this_y))
+            
+            
+        elif self.name == 'pawn':
+            #pawn: depends on color + nearby
+            move_pawn_color = [(0,1,'b'), (1,1,'b'),(-1,1,'b'), (0,-1,'w'),(-1,-1,'w'),(1,-1,'w')]
+            move_pawn = [(dx,dy) for dx, dy, color in move_pawn_color if color == self.color]
+
+            for dx, dy in move_pawn:
+                this_x, this_y = x+dx,y+dy
+                if -1<this_x<8 and -1<this_y<8:
+                    if dx == 0 and board[this_x][this_y] == None: 
+                        moves.append((this_x, this_y))
+                    elif dx!= 0  and board[this_x][this_y] != None and board[this_x][this_y].color != self.color:
+                        moves.append((this_x, this_y))
+
+            if (y, self.color) in [(1,'b'),(6,'w')]:
+                dy = 2 if self.color == 'b' else -2
+                if board[x+0][y+dy] == None or  board[x+0][y+dy].color != self.color:
+                    moves.append((x+0,y+dy))
+
+        return moves
+
+```
+
 # Chess: Render(), Reset(), Step()
 
 First, we need to render the full chess table first. Generating Objects on the board tables:
