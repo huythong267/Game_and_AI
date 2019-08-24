@@ -33,35 +33,39 @@ User input
             if event.key==pygame.K_q:
 ```
 
-## Snake environment
+# Snake environment
 I want to follow the `gym enviroment`, thus this environment must has following function:   
-(1) env.render()    (2) env.reset()     (3) env.step() 
+(1) env.render()    
+(2) env.reset()     
+(3) env.step() 
 
 First, write some very basic drawings for this environment, implying grids for the snake to move. 
 No object is inside the env at the moment.
 
 ```python
 class SnakeGame():    
-    def __init__(self, width, nrows, ncols):
+    def __init__(self, width, nx, ny, 
+                 color_food = (100,0,0), color_head = (0,150,0), color_snake = (0,0,150)):
         self.width = width
-        self.nrows, self.ncols = nrows, ncols
-        self.X, self.Y = self.width*self.ncols, self.width*self.nrows
-        self.win = pygame.display.set_mode((self.width*self.ncols, self.width*(self.nrows+2)))
+        self.nx, self.ny = nx, ny
+        self.X, self.Y = self.width*self.nx, self.width*self.ny
+        self.win = pygame.display.set_mode((self.width*self.nx, self.width*(self.ny+2)))
         
     def render(self):
         self.draw_grid()
         pygame.display.update()
-        
+    
     ################ Helper function to draw ###########
     def draw_grid(self):
         pygame.draw.rect(self.win, (255,255,255), (0, 0, self.X, self.Y+2*self.width))
-        for y in range(self.nrows+1):
+        for y in range(self.ny+1):
             pygame.draw.line(self.win, (0,0,0), (0, y*self.width), (self.X, y*self.width))
-        for x in range(self.ncols+1):
+        for x in range(self.nx+1):
             pygame.draw.line(self.win, (0,0,0), (x*self.width,0), (x*self.width,self.Y))
 ```
 
-Code to view the pygame windown:
+Code to view the pygame window:
+
 ```python
 snake = SnakeGame(35,15,10)
 clock = pygame.time.Clock()
@@ -137,7 +141,7 @@ class Snake():
                 pygame.draw.rect(self.win, self.color_snake,(x*self.width+1, y*self.width+1, self.width-1, self.width-1))
 ```
 
-![image 1]()
+![image 1](https://github.com/huythong267/Game_and_AI/blob/master/Project%201%20Snake/save_imgs/check1.png)
 
 ```python
 
