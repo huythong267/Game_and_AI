@@ -33,6 +33,14 @@ User input
             if event.key==pygame.K_q:
 ```
 
+Display text
+```python
+pygame.font.init()
+STAT_FONT = pygame.font.SysFont("comicsans", 50)
+score_label = STAT_FONT.render('Scores: ' + str(int(self.score)), 2, (255,255,255))
+self.win.blit(score_label, (WIN_WIDTH - score_label.get_width()-15, 10))
+```
+
 # Snake environment
 I want to follow the `gym enviroment`, thus this environment must has following function:   
 (1) env.render()    
@@ -143,7 +151,75 @@ class Snake():
 
 ![image 1](https://github.com/huythong267/Game_and_AI/blob/master/Project%201%20Snake/save_imgs/check1.png)
 
+# Step() function
+
+(1) receive action: LEFT, RIGHT, UP, DOWN   
+(2) check if snake hit itself   
+(3) check if the snake eats the food --> generate a new food
+
 ```python
+pygame.font.init()
+FONT = pygame.font.SysFont("comicsans", 30)
+
+class SnakeGame():    
+    def __init__(self, width, nx, ny, 
+                 color_food = (100,0,0), color_head = (0,150,0), color_snake = (0,0,150)):
+
+        self.score = 0
+        self.snake = Snake(self,color_head, color_snake)
+        self.add_food()
+        
+    def render(self):
+        self.draw_grid()
+        self.snake.draw()
+        self.food.draw()
+        self.update_score()
+        pygame.display.update()
+        
+    def step(self,action):
+        self.snake.move(self,action)
+        
+        #check if snake eats the food, then create new food
+        if (self.food.x,self.food.y) == self.snake.body[0]:  self.add_food()
+            
+        #check if the snake hit itself
+        if len(self.snake.body) != len(set(self.snake.body)):  return False
+        else: return True
+        
+    def add_food(self):
+        valid = {(x,y) for x in range(self.nx) for y in range(self.ny)} - set(self.snake.body)
+        loc = random.sample(valid,1)[0]
+        self.food = Food(self,self.color_food, loc)
+        
+    ################ Helper function to draw ###########
+    def update_score(self):
+        self.score = len(self.snake.body) - 3
+        remark = FONT.render('Scores: ' + str(self.score), 2, (0,0,0))
+        self.win.blit(remark, (10, self.Y+10))
+    
+    def draw_grid(self):
+            
+class Food():
+        
+class Snake():
+    def __init__(self, env, color_head, color_snake):
+        
+        self.dirx, self.diry = 1,0
+        self.body = [(3,3),(3,4),(3,5)]
+    
+    def move(self,env, action):
+        if action != (0,0):
+            self.dirx, self.diry = action
+        x,y = self.body[0]
+        next_head_x, next_head_y = (x+self.dirx)%self.nx, (y+self.diry)%self.ny
+        
+        # if hit the food then keep its tail, else remove
+        if (next_head_x, next_head_y) == (env.food.x, env.food.y):
+            self.body = [(next_head_x, next_head_y)] + self.body
+        else:
+            self.body = [(next_head_x, next_head_y)] + self.body[:-1]
+    
+    def draw(self):
 
 ```
 
