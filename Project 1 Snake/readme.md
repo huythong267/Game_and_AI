@@ -223,9 +223,36 @@ class Snake():
 
 ```
 
+# Human interaction
 
 ```python
+def action_forward(env, mode = 'random'):
+    key_map = {'LEFT': (-1,0), 'RIGHT': (1,0), 'UP': (0,-1), 'DOWN': (0,1), 'NONE': (0,0)}
+    
+    if mode == 'human':
+        ans  = 'NONE'
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
 
+            keys = pygame.key.get_pressed()
+            for key in keys:
+                if keys[pygame.K_LEFT]:    ans = 'LEFT'
+                elif keys[pygame.K_RIGHT]: ans = 'RIGHT'
+                elif keys[pygame.K_UP]:    ans = 'UP'
+                elif keys[pygame.K_DOWN]:  ans = 'DOWN'
+        return key_map[ans]
+    
+    if mode == 'random':
+        choices = []
+        head_x, head_y = env.snake.body[0]
+        locations = set([(x,y) for x,y in env.snake.body])
+        for k, (dx,dy) in key_map.items():
+            next_head = ((head_x+dx)%env.nx,(head_y+dy)%env.ny)
+            if next_head not in locations:
+                choices.append(k)
+        ans =  random.choice(choices) if choices else 'NONE'
+        return key_map[ans]
 ```
 
 ```python
