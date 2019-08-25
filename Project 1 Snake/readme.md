@@ -222,6 +222,9 @@ class Snake():
     def draw(self):
 
 ```
+![image 2](https://github.com/huythong267/Game_and_AI/blob/master/Project%201%20Snake/save_imgs/check2.png)
+
+Well, the game is ready now!
 
 # Human interaction
 
